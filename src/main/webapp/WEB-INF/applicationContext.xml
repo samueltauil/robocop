@@ -30,4 +30,8 @@
         <package>com.redhat.gpe</package>
     </camelContext>
 
+    <bean id="mydatasource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="org.mariadb.jdbc.Driver"/>
+        <!--add attributes to connect to database-->
+    </bean>
 </beans>

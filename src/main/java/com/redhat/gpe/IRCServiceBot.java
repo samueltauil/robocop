@@ -13,23 +13,26 @@ import java.util.Properties;
 @Component
 public class IRCServiceBot extends RouteBuilder {
 
-//    @Override
-//    public void configure() throws Exception {
-//            from(createIRCEndpointName()).process(new Processor() {
-//                public void process(Exchange exchange) throws Exception {
-//                    System.out.println(exchange.getIn().getBody().toString());
-//                }
-//            });
-//    }
+    public static final String SBINFOAY = "SBINFOA+";
+    public static final String SBINFOAN = "SBINFOA-";
+    public static final String MEMFORGE = "MEMFORGE";
 
-   //using lambda in processor
+
     @Override
     public void configure() throws Exception {
 
-        from(createIRCEndpointName())
-                .process((exchange) -> {
-                    System.out.println(exchange.getIn().getBody().toString());
-                });
+            from(createIRCEndpointName())
+                    .choice()
+                    .when(body().isEqualTo(SBINFOAY))
+                        .process(new StudentsWithAccountProcessor()).to("jdbc:mydatasource").to(createIRCEndpointName())
+
+                    .when(body().isEqualTo(SBINFOAN))
+                        .process(new StudentsWithoutAccountProcessor()).to("jdbc:mydatasource").to(createIRCEndpointName());
+
+//                    .when(body().isEqualTo(MEMFORGE))    //need to check this, not working yet
+//                        .process(new MemoryInfoForge()).to("ssh://stauilrh@forge.opentlc.com?timeout=3000&useFixedDelay=true&delay=5000&certResource=file:/Users/samueltauil/.ssh/id_rsa").to(createIRCEndpointName());
+
+
     }
 
     public Properties loadProperties() throws IOException {
@@ -52,4 +55,5 @@ public class IRCServiceBot extends RouteBuilder {
         System.out.println(endpoint);
         return endpoint;
     }
+
 }
